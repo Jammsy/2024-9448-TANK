@@ -11,24 +11,43 @@ import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class ShooterSubsystem extends SubsystemBase {
-    private static final String kCANBus = "rio";
+    private static String kCANBus;
 
-    private final TalonFX m_shooter = new TalonFX(ShooterConstants.kShooter, kCANBus);
-    private final TalonFX m_loader = new TalonFX(ShooterConstants.kLoader, kCANBus);
+    private TalonFX m_shooter;
+    private TalonFX m_loader;
 
+    boolean m_shooterRunning;
+
+    public ShooterSubsystem(){
+        kCANBus = "rio";
+        m_shooter = new TalonFX(ShooterConstants.kShooter, kCANBus);
+        m_loader = new TalonFX(ShooterConstants.kLoader, kCANBus);
+
+        m_shooterRunning = false;
+    }
+    
+    public void runShooter(){
+        m_shooterRunning = true;
+    }
+
+    public void stopShooter(){
+        m_shooterRunning = false;
+    }
 
     @Override
-    public void periodic(){}
+    public void periodic(){
+        //smartdashboard stuff goes here
+        if(m_shooterRunning){
+            m_shooter.set(Constants.ShooterConstants.kShooterPower);
+            m_loader.set(Constants.ShooterConstants.kloaderPower);
+        }
+    }
 
-    public void robotInit(){}
-    
-    public Command shoot(){
-        return runOnce(
-            () -> {
-                m_shooter.set(Constants.ShooterConstants.kShooterPower);
-                m_loader.set(Constants.ShooterConstants.kloaderPower);
-            });
+    public void intake(){
+        m_shooter.set(-Constants.ShooterConstants.kShooterPower);
+        m_loader.set(-Constants.ShooterConstants.kLoader);
     }
 }
