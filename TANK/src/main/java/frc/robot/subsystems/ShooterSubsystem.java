@@ -19,35 +19,32 @@ public class ShooterSubsystem extends SubsystemBase {
     private TalonFX m_shooter;
     private TalonFX m_loader;
 
-    boolean m_shooterRunning;
-
     public ShooterSubsystem(){
         kCANBus = "rio";
         m_shooter = new TalonFX(ShooterConstants.kShooter, kCANBus);
         m_loader = new TalonFX(ShooterConstants.kLoader, kCANBus);
-
-        m_shooterRunning = false;
-    }
-    
-    public void runShooter(){
-        m_shooterRunning = true;
     }
 
-    public void stopShooter(){
-        m_shooterRunning = false;
+
+
+    public Command runShooter(){
+        return run(
+        () -> {
+           m_shooter.set(Constants.ShooterConstants.kShooterPower);
+           m_loader.set(Constants.ShooterConstants.kloaderPower);
+        });
     }
 
     @Override
     public void periodic(){
         //smartdashboard stuff goes here
-        if(m_shooterRunning){
-            m_shooter.set(Constants.ShooterConstants.kShooterPower);
-            m_loader.set(Constants.ShooterConstants.kloaderPower);
-        }
     }
 
-    public void intake(){
-        m_shooter.set(-Constants.ShooterConstants.kShooterPower);
-        m_loader.set(-Constants.ShooterConstants.kLoader);
+    public Command intake(){
+         return run(
+        () -> {
+           m_shooter.set(-Constants.ShooterConstants.kShooterPower);
+           m_loader.set(-Constants.ShooterConstants.kloaderPower);
+        });
     }
 }
